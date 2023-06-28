@@ -10,14 +10,17 @@ import Combine
 
 protocol MainViewModelProtocol {
     var categories: Categories? {get set}
+    var imageArray: [Data] {get set}
     var coordinator: MainCoordinatorProtocol! {get}
     var updateTableState: PassthroughSubject<TableViewState, Never> {get set}
     func fetchCategories()
+    func getImage()
 }
 
 class MainViewModel: MainViewModelProtocol {
     var vc: MainViewController!
     var categories: Categories?
+    var imageArray: [Data] = []
     var coordinator: MainCoordinatorProtocol!
     var updateTableState = PassthroughSubject<TableViewState, Never>()
     private var cancellable = Set<AnyCancellable>()
@@ -39,19 +42,48 @@ class MainViewModel: MainViewModelProtocol {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
         
-        publisher.sink { [self] completion in
+        publisher.sink { completion in
             switch completion {
             case .finished:
-                print("Fetch categories pulisher is finished!")
-                
+                print("Fetch categories pulisher was finished!")
             case .failure(let error):
                 print(error)
-                self.updateTableState.send(.failure)
             }
         } receiveValue: { [self] result in
             self.categories = result
-            print(self.categories!.сategories.count)
-            self.updateTableState.send(.success)
+            getImage()
         }.store(in: &cancellable)
     }
+    
+    //MARK: - getImage
+    func getImage() {
+        guard let categories = categories?.сategories else {return}
+        
+        for item in categories {
+            guard let url = URL(string: item.imageURL) else {return}
+            let request = URLRequest(url: url)
+            
+            //издатель
+            let publisher = URLSession.shared.dataTaskPublisher(for: request)
+                .map { $0.data }
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+            
+            publisher.sink { [self] completion in
+                switch completion {
+                case .finished:
+                    print("Image publisher was finished")
+                case .failure(let error):
+                    print("Image publisher error \(error.localizedDescription)")
+                    self.updateTableState.send(.failure)
+                }
+            } receiveValue: { [self] data in
+                self.imageArray.append(data)
+                if imageArray.count == categories.count {
+                    updateTableState.send(.success)
+                }
+            }.store(in: &cancellable)
+        }
+    }
+    
 }
