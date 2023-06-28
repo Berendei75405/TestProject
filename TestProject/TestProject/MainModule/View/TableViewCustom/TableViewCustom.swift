@@ -28,6 +28,8 @@ class TableViewCustom: UITableView {
     override init(frame: CGRect, style: UITableView.Style) {
         super .init(frame: .zero, style: .insetGrouped)
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.separatorStyle = .none
+        self.backgroundColor = .white
         
         self.register(TableCell.self, forCellReuseIdentifier: TableCell.identifier)
         
@@ -71,7 +73,8 @@ extension TableViewCustom: UITableViewDelegate, UITableViewDataSource {
         if let cell = tableView.dequeueReusableCell(withIdentifier: TableCell.identifier) as? TableCell {
             let cat = vc.viewModel.categories?.сategories[indexPath.row]
             
-            cell.configurate(name: cat?.name ?? "")
+            cell.selectionStyle = .none
+            cell.configurate(name: cat?.name ?? "", imageData: vc.viewModel.imageArray[indexPath.row])
             
             return cell
         }
@@ -79,8 +82,11 @@ extension TableViewCustom: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 150
+        return 160
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        vc.viewModel.coordinator.showDetailModule()
+    }
     
 }
