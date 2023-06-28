@@ -8,16 +8,19 @@
 import UIKit
 
 protocol MainCoordinatorProtocol {
-    var navigationController: UINavigationController? {get}
+    var tabBar: TabBarController? {get}
     func createModule() -> UIViewController
+    func createDetailModule() -> UIViewController
+    func showDetailModule()
+    func popToRoot()
     func initailViewController()
 }
 
 class Coordinator: MainCoordinatorProtocol {
-    var navigationController: UINavigationController?
+     var tabBar: TabBarController?
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init(tabBar: TabBarController) {
+        self.tabBar = tabBar
         
     }
     
@@ -26,22 +29,61 @@ class Coordinator: MainCoordinatorProtocol {
         let view = MainViewController()
         let viewModel = MainViewModel()
         let tableView = TableViewCustom()
-        let router = self
+        let coordinator = self
+        
         
         view.viewModel = viewModel
         view.tableView = tableView
         tableView.vc = view
         
-        viewModel.coordinator = router
+        if let tabBar = tabBar {
+            tabBar.coordinator = coordinator
+        }
+        
+        viewModel.coordinator = coordinator
+        
+        return view
+    }
+    
+    //MARK: - createDetailModule
+    func createDetailModule() -> UIViewController {
+        let view = DishViewController()
+        let viewModel = DishViewModel()
+        let coordinator = self
+        
+        view.viewModel = viewModel
+        viewModel.coordinator = coordinator
         
         return view
     }
     //MARK: - initailViewController
     func initailViewController() {
-        if let navigationController = navigationController {
+        if let tabBar = tabBar {
             let view = createModule()
+        
+            tabBar.viewControllers = [UINavigationController(rootViewController: view)]
+        }
+    }
+    
+    //MARK: - showDetailModule
+    func showDetailModule() {
+        if let tabBar = tabBar {
+            let view = createDetailModule()
+            view.navigationItem.hidesBackButton = true
             
-            navigationController.viewControllers = [view]
+            guard let nvc = tabBar.viewControllers?.first as? UINavigationController else {return}
+
+            nvc.pushViewController(view, animated: true)
+            //tabBar.selectedViewController?.show(view, sender: nil)
+        }
+    }
+    
+    //MARK: - popToRoot
+    func popToRoot() {
+        if let tabBar = tabBar {
+            guard let nvc = tabBar.viewControllers?.first as? UINavigationController else {return}
+            
+            nvc.popToRootViewController(animated: true)
         }
     }
 }
