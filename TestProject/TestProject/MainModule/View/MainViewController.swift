@@ -9,26 +9,94 @@ import UIKit
 import Combine
 
 class MainViewController: UIViewController {
-    
-    var tableView: TableViewCustom = TableViewCustom(frame: .zero, style:  .insetGrouped)
     var viewModel: MainViewModelProtocol!
     private var cancellable = Set<AnyCancellable>()
+    //обновление таблицы
+    var tableReload: Bool = false {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    
+    //MARK: - tableView
+    private lazy var tableView: UITableView = {
+        var table = UITableView(frame: .zero, style: .insetGrouped)
+        view.addSubview(table)
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.separatorStyle = .none
+        table.backgroundColor = .white
+        table.showsVerticalScrollIndicator = false
+        
+        table.register(TableCell.self,
+                       forCellReuseIdentifier: TableCell.identifier)
+        
+        table.delegate = self
+        table.dataSource = self
+        
+        return table
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.fetchCategories()
         updateTableState()
-        tableView.createConstraintsForTable(view: self.view)
+        createConstraintsForTable()
         setNavigationBarMain()
     }
     
+    //MARK: - updateTableState
     private func updateTableState() {
-        viewModel.updateTableState.sink { [self] state in
-            self.tableView.tableState = state
+        viewModel.updateTableState.sink { [weak self] state in
+            self?.tableReload = state
         }.store(in: &cancellable)
     }
-
+    
+    //MARK: - createConstraintsForTable
+    private func createConstraintsForTable() {
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(
+                equalTo: view.topAnchor),
+            
+            tableView.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor),
+            
+            tableView.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor),
+            
+            tableView.bottomAnchor.constraint(
+                equalTo: view.bottomAnchor)
+        ])
+    }
 }
+
+//MARK: - extensions
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.viewModel.categories?.сategories.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: TableCell.identifier) as? TableCell {
+            let cat = self.viewModel.categories?.сategories[indexPath.row]
+            
+            cell.selectionStyle = .none
+            cell.configurate(name: cat?.name ?? "", imageData: self.viewModel.imageArray[indexPath.row])
+            
+            return cell
+        }
+        return UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 160
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let categorySelect = self.viewModel.categories?.сategories[indexPath.row].name ?? ""
+        self.viewModel.coordinator.showDetailModule(categorySelect: categorySelect)
+    }
+}
+
 
 extension UIViewController {
     func setNavigationBarMain() {
@@ -56,7 +124,7 @@ extension UIViewController {
         dateLabel.font = .systemFont(ofSize: 14)
         dateLabel.textColor = .gray
         
-        let profileImageView = UIImageView(frame: CGRect(x: view.frame.width - 75, y: 0, width: 44, height: 44))
+        let profileImageView = UIImageView(frame: CGRect(x: view.frame.width - view.frame.width/5, y: -2, width: 44, height: 44))
         profileImageView.image = UIImage(named: "face")
         profileImageView.layer.cornerRadius = 22
         profileImageView.clipsToBounds = true
