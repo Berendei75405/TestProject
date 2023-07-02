@@ -8,26 +8,25 @@
 import Foundation
 import Combine
 
-protocol MainViewModelProtocol {
+protocol MainViewModelProtocol: AnyObject {
     var categories: Categories? {get set}
     var imageArray: [Data] {get set}
     var coordinator: MainCoordinatorProtocol! {get}
-    var updateTableState: PassthroughSubject<TableViewState, Never> {get set}
+    var updateTableState: PassthroughSubject<Bool, Never> {get set}
     func fetchCategories()
     func getImage()
 }
 
 class MainViewModel: MainViewModelProtocol {
-    var vc: MainViewController!
     var categories: Categories?
     var imageArray: [Data] = []
     var coordinator: MainCoordinatorProtocol!
-    var updateTableState = PassthroughSubject<TableViewState, Never>()
+    var updateTableState = PassthroughSubject<Bool, Never>()
     private var cancellable = Set<AnyCancellable>()
     
     //MARK: - init
     init() {
-        updateTableState.send(.initial)
+        updateTableState.send(false)
     }
     
     //MARK: - fetchCategories
@@ -75,15 +74,14 @@ class MainViewModel: MainViewModelProtocol {
                     print("Image publisher was finished")
                 case .failure(let error):
                     print("Image publisher error \(error.localizedDescription)")
-                    self.updateTableState.send(.failure)
+                    self.updateTableState.send(false)
                 }
             } receiveValue: { [self] data in
                 self.imageArray.append(data)
                 if imageArray.count == categories.count {
-                    updateTableState.send(.success)
+                    updateTableState.send(true)
                 }
             }.store(in: &cancellable)
         }
     }
-    
 }
