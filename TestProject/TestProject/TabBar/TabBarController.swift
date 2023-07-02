@@ -122,7 +122,7 @@ class TabBarController: UITabBarController {
         mainView.addSubview(homeImageView)
         NSLayoutConstraint.activate([
             homeImageView.topAnchor.constraint(equalTo: mainView.topAnchor),
-            homeImageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 31),
+            homeImageView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: mainView.frame.width/12),
             homeImageView.widthAnchor.constraint(equalToConstant: 48),
             homeImageView.heightAnchor.constraint(equalToConstant: 49)
         ])
@@ -131,7 +131,7 @@ class TabBarController: UITabBarController {
         mainView.addSubview(homeButton)
         NSLayoutConstraint.activate([
             homeButton.topAnchor.constraint(equalTo: self.tabBar.topAnchor),
-            homeButton.leadingAnchor.constraint(equalTo: self.tabBar.leadingAnchor, constant: 31),
+            homeButton.leadingAnchor.constraint(equalTo: self.tabBar.leadingAnchor, constant: mainView.frame.width/12),
             homeButton.widthAnchor.constraint(equalToConstant: 48),
             homeButton.heightAnchor.constraint(equalToConstant: 49)
         ])
@@ -140,7 +140,7 @@ class TabBarController: UITabBarController {
         mainView.addSubview(searchImageView)
         NSLayoutConstraint.activate([
             searchImageView.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            searchImageView.leadingAnchor.constraint(equalTo: homeImageView.trailingAnchor, constant: 41),
+            searchImageView.leadingAnchor.constraint(equalTo: homeImageView.trailingAnchor, constant: mainView.frame.width/8),
             searchImageView.widthAnchor.constraint(equalToConstant: 48),
             searchImageView.heightAnchor.constraint(equalToConstant: 49)
         ])
@@ -149,34 +149,16 @@ class TabBarController: UITabBarController {
         mainView.addSubview(searchButton)
         NSLayoutConstraint.activate([
             searchButton.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            searchButton.leadingAnchor.constraint(equalTo: homeImageView.trailingAnchor, constant: 41),
+            searchButton.leadingAnchor.constraint(equalTo: homeImageView.trailingAnchor, constant: mainView.frame.width/8),
             searchButton.widthAnchor.constraint(equalToConstant: 48),
             searchButton.heightAnchor.constraint(equalToConstant: 49)
-        ])
-        
-        //MARK: - shopImageView constraint
-        mainView.addSubview(shopImageView)
-        NSLayoutConstraint.activate([
-            shopImageView.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            shopImageView.leadingAnchor.constraint(equalTo: searchImageView.trailingAnchor, constant: 41),
-            shopImageView.widthAnchor.constraint(equalToConstant: 48),
-            shopImageView.heightAnchor.constraint(equalToConstant: 49)
-        ])
-        
-        //MARK: - shopButton constraint
-        mainView.addSubview(shopButton)
-        NSLayoutConstraint.activate([
-            shopButton.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            shopButton.leadingAnchor.constraint(equalTo: searchImageView.trailingAnchor, constant: 41),
-            shopButton.widthAnchor.constraint(equalToConstant: 48),
-            shopButton.heightAnchor.constraint(equalToConstant: 49)
         ])
         
         //MARK: - personImageView constraint
         mainView.addSubview(personImageView)
         NSLayoutConstraint.activate([
             personImageView.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            personImageView.leadingAnchor.constraint(equalTo: shopImageView.trailingAnchor, constant: 41),
+            personImageView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -mainView.frame.width/12),
             personImageView.widthAnchor.constraint(equalToConstant: 48),
             personImageView.heightAnchor.constraint(equalToConstant: 49)
         ])
@@ -185,10 +167,30 @@ class TabBarController: UITabBarController {
         mainView.addSubview(personButton)
         NSLayoutConstraint.activate([
             personButton.topAnchor.constraint(equalTo: self.mainView.topAnchor),
-            personButton.leadingAnchor.constraint(equalTo: shopImageView.trailingAnchor, constant: 41),
+            personButton.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -mainView.frame.width/12),
             personButton.widthAnchor.constraint(equalToConstant: 48),
             personButton.heightAnchor.constraint(equalToConstant: 49)
         ])
+        
+        //MARK: - shopImageView constraint
+        mainView.addSubview(shopImageView)
+        NSLayoutConstraint.activate([
+            shopImageView.topAnchor.constraint(equalTo: self.mainView.topAnchor),
+            shopImageView.trailingAnchor.constraint(equalTo: personImageView.leadingAnchor, constant: -mainView.frame.width/8),
+            shopImageView.widthAnchor.constraint(equalToConstant: 48),
+            shopImageView.heightAnchor.constraint(equalToConstant: 49)
+        ])
+        
+        //MARK: - shopButton constraint
+        mainView.addSubview(shopButton)
+        NSLayoutConstraint.activate([
+            shopButton.topAnchor.constraint(equalTo: self.mainView.topAnchor),
+            shopButton.trailingAnchor.constraint(equalTo: personImageView.leadingAnchor, constant: -mainView.frame.width/8),
+            shopButton.widthAnchor.constraint(equalToConstant: 48),
+            shopButton.heightAnchor.constraint(equalToConstant: 49)
+        ])
+        
+        
         
     }
     
@@ -211,6 +213,7 @@ class TabBarController: UITabBarController {
     
     //MARK: - shopAction
     @objc private func shopAction(sender: UIButton) {
+        coordinator.showBasketModule()
         homeImageView.image = UIImage(named: "home")
         searchImageView.image = UIImage(named: "search")
         shopImageView.image = UIImage(named: "shopBlue")
