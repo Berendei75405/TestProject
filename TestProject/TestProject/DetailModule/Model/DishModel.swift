@@ -7,6 +7,10 @@
 
 import Foundation
 
+struct DishArray: Codable {
+    var dishes: [Dish]
+}
+
 // MARK: - Dish
 struct Dish: Codable {
     let id: Int
@@ -28,4 +32,5 @@ enum Teg: String, Codable {
     case сРисом = "С рисом"
     case сРыбой = "С рыбой"
     case салаты = "Салаты"
+    case роллы = "Роллы"
 }
