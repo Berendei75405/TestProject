@@ -7,14 +7,20 @@
 
 import UIKit
 
+protocol CustomStepperDelegateProtocol: AnyObject {
+    func decrease(tag: Int)
+    func increaseButton(tag: Int)
+}
+
 final class CustomStepper: UIControl {
     /// Счетчик степпер который мы можем считывать и записывать
     var currentValue = 1 {
         didSet {
-            currentValue = currentValue > 0 ? currentValue : 0
             currentStepValueLabel.text = "\(currentValue)"
         }
     }
+    
+    weak var delegate: CustomStepperDelegateProtocol?
     
     private lazy var decreaseButton: UIButton = {
        let button = UIButton()
@@ -86,12 +92,13 @@ final class CustomStepper: UIControl {
         switch sender {
         case decreaseButton:
             currentValue -= 1
+            delegate?.decrease(tag: self.tag)
         case increaseButton:
             currentValue += 1
+            delegate?.increaseButton(tag: self.tag)
         default:
             break
         }
-        sendActions(for: .touchUpInside)
     }
 }
 
