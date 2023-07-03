@@ -82,15 +82,12 @@ class BasketViewController: UIViewController {
     
     private func configurateButton() {
         if self.viewModel.getModel().count == .zero {
-            UIView.animate(withDuration: 0.3) {
-                self.buyButton.alpha = 0
-            }
+            self.buyButton.isHidden = true
         } else {
-            self.buyButton.alpha = 1
+            self.buyButton.isHidden = false
             self.buyButton.setTitle("Оплатить \(self.viewModel.returnTotalPrice()) ₽", for: .normal)
         }
     }
-
     
 }
 
