@@ -100,9 +100,22 @@ class DishViewModel: DishViewModelProtocol {
     
     //MARK: - appendDish
     func appendDish(dish: Dish, image: Data, key: String) {
-        let dishModelForSave = DishModelForSave(name: dish.name, price: dish.price, weight: dish.price, image: image)
-        let userDefaults = UserDefaults.standard
-        userDefaults.save(array: [dish], forKey: key)
+        let dishModelForSave = DishModelForSave(name: dish.name, count: 1, price: dish.price, weight: dish.price, image: image)
+        if var arrayLoad = UserDefaults.standard.load(arrayForKey: key) as [DishModelForSave]? {
+            if arrayLoad.isEmpty {
+                UserDefaults.standard.save(array: [dishModelForSave], forKey: key)
+            } else {
+                if arrayLoad.contains(where: {$0.name == dishModelForSave.name}) {
+                    let index = arrayLoad.firstIndex(where: {$0.name == dishModelForSave.name}) ?? 0
+                    arrayLoad[index].count += 1
+                } else {
+                    arrayLoad.append(dishModelForSave)
+                }
+                UserDefaults.standard.save(array: arrayLoad, forKey: key)
+            }
+        } else {
+            UserDefaults.standard.save(array: [dishModelForSave], forKey: key)
+        }
     }
     
 }
