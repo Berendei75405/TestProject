@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class BasketViewController: UIViewController {
     var viewModel: BasketViewModelProtocol!
@@ -34,10 +35,27 @@ class BasketViewController: UIViewController {
         return button
     }()
     
+    //MARK: - cancellable
+    private var cancellable = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBarMain()
         setContraints()
+        updateButton()
+        configurateButton()
+    }
+    
+    //MARK: - updateButton
+    private func updateButton() {
+        self.viewModel.reloadView.sink { [weak self] bool in
+            if bool == true {
+                self?.configurateButton()
+            } else {
+                self?.configurateButton()
+                self?.tableView.reloadData()
+            }
+        }.store(in: &cancellable)
     }
     
     //MARK: - setContraints
@@ -62,16 +80,49 @@ class BasketViewController: UIViewController {
         ])
     }
     
+    private func configurateButton() {
+        if self.viewModel.getModel().count == .zero {
+            UIView.animate(withDuration: 0.3) {
+                self.buyButton.alpha = 0
+            }
+        } else {
+            self.buyButton.alpha = 1
+            self.buyButton.setTitle("Оплатить \(self.viewModel.returnTotalPrice()) ₽", for: .normal)
+        }
+    }
+
+    
 }
 
-extension BasketViewController: UITableViewDelegate, UITableViewDataSource {
+extension BasketViewController: UITableViewDelegate,
+                                UITableViewDataSource,
+                                CustomStepperDelegateProtocol {
+    func decrease(tag: Int) {
+        self.viewModel.removeModel(index: tag)
+    }
+    
+    func increaseButton(tag: Int) {
+        self.viewModel.appendModel(index: tag)
+    }
+    
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return self.viewModel.getModel().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: BasketCell.identifier) as?
             BasketCell {
+            
+            let dish = self.viewModel.getModel()
+            cell.stepper.tag = indexPath.row
+            cell.selectionStyle = .none
+            cell.config(image: dish[indexPath.row].image,
+                        name: dish[indexPath.row].name,
+                        weight: dish[indexPath.row].weight,
+                        price: dish[indexPath.row].price,
+                        count: dish[indexPath.row].count)
+            cell.stepper.delegate = self
             
             return cell
         }
@@ -79,8 +130,6 @@ extension BasketViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 90
     }
-    
-    
 }
