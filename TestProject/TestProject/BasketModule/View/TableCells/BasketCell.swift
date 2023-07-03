@@ -66,7 +66,7 @@ final class BasketCell: UITableViewCell {
     }()
     
     //MARK: - stepper
-    private var stepper: CustomStepper = {
+    var stepper: CustomStepper = {
         var step = CustomStepper(frame: .zero)
         step.translatesAutoresizingMaskIntoConstraints = false
 
@@ -79,10 +79,10 @@ final class BasketCell: UITableViewCell {
         //MARK: - grayView constraint
         contentView.addSubview(grayView)
         NSLayoutConstraint.activate([
-            grayView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            grayView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             grayView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             grayView.widthAnchor.constraint(equalToConstant: 70),
-            grayView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
+            grayView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
         
         //MARK: - dishImageView constraint
@@ -124,17 +124,15 @@ final class BasketCell: UITableViewCell {
             stepper.heightAnchor.constraint(equalToConstant: 35),
             stepper.widthAnchor.constraint(equalToConstant: 100)
         ])
-
-        setupStepper()
     }
     
-    private func setupStepper() {
-        stepper.addTarget(self, action: #selector(stepperChangedValueAction), for: .valueChanged)
-    }
-
-    @objc private func stepperChangedValueAction(sender: CustomStepper) {
-        print(sender)
-        print(sender.currentValue)
+    //MARK: - config
+    func config(image: Data, name: String, weight: Int, price: Int, count: Int) {
+        self.dishImageView.image = UIImage(data: image)
+        self.nameLabel.text = name
+        self.weightLabel.text = " · \(weight)"
+        self.priceLabel.text = "\(price) ₽"
+        self.stepper.currentValue = count
     }
     
     required init?(coder: NSCoder) {
