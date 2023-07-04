@@ -18,7 +18,7 @@ final class DishTableCell: UITableViewCell {
     private lazy var height = UIScreen.main.bounds.size.height/5
     weak var delegate: DishTableViewCellDelegateProtocol?
     
-    private var imageDict: [Int: Data] = [:]
+    private var imageArray: [Data] = []
     private var dishArray: DishArray = .init(dishes: [])
     
     //MARK: - collectionViewFlowLayout
@@ -62,8 +62,8 @@ final class DishTableCell: UITableViewCell {
     }
     
     //MARK: - configurate
-    func configurate(imageDict: [Int: Data], dishArray: DishArray) {
-        self.imageDict = imageDict
+    func configurate(imageArray: [Data], dishArray: DishArray) {
+        self.imageArray = imageArray
         self.dishArray = dishArray
     }
     
@@ -81,7 +81,7 @@ extension DishTableCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DishCell.identifier, for: indexPath) as? DishCell {
             cell.configurateCell(name: self.dishArray.dishes[indexPath.row].name,
-                                 imageData: self.imageDict[dishArray.dishes[indexPath.row].id] ?? Data())
+                                 imageData: self.imageArray[indexPath.row])
             
             return cell
         }
@@ -91,7 +91,7 @@ extension DishTableCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         //delegate
         self.delegate?.showDish(dish: self.dishArray.dishes[indexPath.row],
-                                image: self.imageDict[dishArray.dishes[indexPath.row].id] ?? Data())
+                                image: self.imageArray[indexPath.row])
 
     }
     
