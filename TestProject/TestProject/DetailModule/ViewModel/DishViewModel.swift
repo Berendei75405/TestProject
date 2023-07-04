@@ -10,7 +10,7 @@ import Combine
 
 protocol DishViewModelProtocol: AnyObject {
     var dishArray: DishArray? {get set}
-    var imageArray: [Int : Data] {get set}
+    var imageArray: [Data] {get set}
     var coordinator: MainCoordinatorProtocol! {get}
     var updateTableState: PassthroughSubject<Bool, Never> {get set}
     var sortDescriptor: Teg {get set}
@@ -22,7 +22,8 @@ protocol DishViewModelProtocol: AnyObject {
 
 class DishViewModel: DishViewModelProtocol {
     var dishArray: DishArray?
-    var imageArray: [Int : Data] = [:]
+    var imageArray: [Data] = []
+    private var networkManager = NetworkManager.shared
     var coordinator: MainCoordinatorProtocol!
     var updateTableState = PassthroughSubject<Bool, Never>()
     var sortDescriptor: Teg = .всеМеню { didSet {self.updateTableState.send(true)}}
@@ -31,54 +32,35 @@ class DishViewModel: DishViewModelProtocol {
     
     //MARK: - fetchDish
     func fetchDish() {
-        guard let url = URL(string: "https://run.mocky.io/v3/aba7ecaa-0a70-453b-b62d-0e326c859b3b") else {return}
-        let request = URLRequest(url: url)
-        
-        //издатель
-        let publisher = URLSession.shared.dataTaskPublisher(for: request)
-            .map(\.data)
-            .decode(type: DishArray.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
-        
-        publisher.sink { completion in
-            switch completion {
-            case .finished:
-                print("Fetch categories pulisher was finished!")
+        networkManager.getDish { [unowned self] result in
+            switch result {
+            case .success(let dish):
+                self.dishArray = dish
+                getImage()
             case .failure(let error):
                 print(error)
             }
-        } receiveValue: { [self] result in
-            self.dishArray = result
-            getImage()
-        }.store(in: &cancellable)
+        }
     }
     
     //MARK: - getImage
     private func getImage() {
         guard let dishArray = dishArray?.dishes else {return}
+        var arrayUrlString: [String] = []
         
         for item in dishArray {
-            guard let url = URL(string: item.imageURL) else {return}
-            
-            let publisher = URLSession.shared.dataTaskPublisher(for: url)
-                .map(\.data)
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            
-            publisher.sink { completion in
-                switch completion {
-                case .finished:
-                    print("image \(item.id) was winished")
-                case .failure(let error):
-                    print(error)
-                }
-            } receiveValue: { [unowned self] result in
-                self.imageArray[item.id] = result
-                if self.imageArray.count == self.dishArray?.dishes.count {
+            arrayUrlString.append(item.imageURL)
+        }
+        networkManager.getImageArray(url: arrayUrlString) { [unowned self] result in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let data):
+                if data.contains(where: {$0 != nil}) {
+                    self.imageArray = data.map {$0!}
                     updateTableState.send(true)
                 }
-            }.store(in: &cancellable)
+            }
         }
     }
     
