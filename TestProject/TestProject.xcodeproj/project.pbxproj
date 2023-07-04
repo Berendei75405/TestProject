@@ -32,6 +32,8 @@
 		CECAC5372A51C51800040CAA /* CustomStepper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECAC5362A51C51800040CAA /* CustomStepper.swift */; };
 		CECAC55C2A51F58900040CAA /* Extension UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECAC55B2A51F58900040CAA /* Extension UserDefaults.swift */; };
 		CECAC55E2A51F81500040CAA /* DishModelForSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECAC55D2A51F81500040CAA /* DishModelForSave.swift */; };
+		CEFE62D12A52EDAA00A55149 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFE62D02A52EDAA00A55149 /* NetworkService.swift */; };
+		CEFE62D42A53133800A55149 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFE62D32A53133800A55149 /* NetworkManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +64,8 @@
 		CECAC5362A51C51800040CAA /* CustomStepper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomStepper.swift; sourceTree = "<group>"; };
 		CECAC55B2A51F58900040CAA /* Extension UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension UserDefaults.swift"; sourceTree = "<group>"; };
 		CECAC55D2A51F81500040CAA /* DishModelForSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DishModelForSave.swift; sourceTree = "<group>"; };
+		CEFE62D02A52EDAA00A55149 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		CEFE62D32A53133800A55149 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +100,8 @@
 			children = (
 				CE1C40342A4B352400DB9A47 /* AppDelegate.swift */,
 				CE1C40362A4B352400DB9A47 /* SceneDelegate.swift */,
+				CEFE62CF2A52ED6C00A55149 /* Services */,
+				CEFE62D22A53100A00A55149 /* Managers */,
 				CECAC5582A51EB0E00040CAA /* Commands */,
 				CE7893152A4C46C900D9E07A /* TabBar */,
 				CE1C405C2A4B57C300DB9A47 /* Coordinator */,
@@ -284,6 +290,22 @@
 			path = Commands;
 			sourceTree = "<group>";
 		};
+		CEFE62CF2A52ED6C00A55149 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CEFE62D02A52EDAA00A55149 /* NetworkService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		CEFE62D22A53100A00A55149 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				CEFE62D32A53133800A55149 /* NetworkManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -357,6 +379,7 @@
 			files = (
 				CE1C405E2A4B57DA00DB9A47 /* Coordinator.swift in Sources */,
 				CE1C40572A4B43B700DB9A47 /* TableCell.swift in Sources */,
+				CEFE62D12A52EDAA00A55149 /* NetworkService.swift in Sources */,
 				CE1C40392A4B352400DB9A47 /* MainViewController.swift in Sources */,
 				CE7893172A4C470900D9E07A /* TabBarController.swift in Sources */,
 				CE7A46112A4D79CE00A38F95 /* DishCell.swift in Sources */,
@@ -366,6 +389,7 @@
 				CECAC55E2A51F81500040CAA /* DishModelForSave.swift in Sources */,
 				CE1C40352A4B352400DB9A47 /* AppDelegate.swift in Sources */,
 				CE1C405B2A4B505100DB9A47 /* MainModel.swift in Sources */,
+				CEFE62D42A53133800A55149 /* NetworkManager.swift in Sources */,
 				CECAC5322A516F0F00040CAA /* BasketViewController.swift in Sources */,
 				CE7330682A4F047400BCC85F /* FilterPickerView.swift in Sources */,
 				CE7893212A4C971C00D9E07A /* DishViewModel.swift in Sources */,
