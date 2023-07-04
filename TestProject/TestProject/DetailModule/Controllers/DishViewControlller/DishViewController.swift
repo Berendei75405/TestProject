@@ -107,7 +107,7 @@ extension DishViewController: UITableViewDelegate, UITableViewDataSource, DishTa
             if let cell = tableView.dequeueReusableCell(withIdentifier: DishTableCell.identifier) as? DishTableCell {
                 
                 cell.selectionStyle = .none
-                cell.configurate(imageDict: self.viewModel.imageArray, dishArray: self.viewModel.getDishSorted())
+                cell.configurate(imageArray: self.viewModel.imageArray, dishArray: self.viewModel.getDishSorted())
                 cell.delegate = self
                 
                 return cell
@@ -120,8 +120,13 @@ extension DishViewController: UITableViewDelegate, UITableViewDataSource, DishTa
         if indexPath.row == .zero {
             return 40
         } else {
-            let countCell = CGFloat((self.viewModel.dishArray?.dishes.count ?? .zero)/3)
+            var countCell: CGFloat = 0
             let height = UIScreen.main.bounds.size.height/5 + 10
+            if self.viewModel.getDishSorted().dishes.count % 3 != 0 {
+                countCell = CGFloat(self.viewModel.getDishSorted().dishes.count / 3) + 1
+            } else {
+                countCell = CGFloat(self.viewModel.getDishSorted().dishes.count / 3)
+            }
             return countCell * height
         }
     }
