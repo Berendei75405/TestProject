@@ -21,6 +21,7 @@ class MainViewModel: MainViewModelProtocol {
     var categories: Categories?
     var imageArray: [Data] = []
     var coordinator: MainCoordinatorProtocol!
+    private let networkManager = NetworkManager.shared
     var updateTableState = PassthroughSubject<Bool, Never>()
     private var cancellable = Set<AnyCancellable>()
     
@@ -31,57 +32,35 @@ class MainViewModel: MainViewModelProtocol {
     
     //MARK: - fetchCategories
     func fetchCategories() {
-        guard let url = URL(string: "https://run.mocky.io/v3/058729bd-1402-4578-88de-265481fd7d54") else {return}
-        let request = URLRequest(url: url)
-        
-        //издатель
-        let publisher = URLSession.shared.dataTaskPublisher(for: request)
-            .map(\.data)
-            .decode(type: Categories.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
-        
-        publisher.sink { completion in
-            switch completion {
-            case .finished:
-                print("Fetch categories pulisher was finished!")
+        networkManager.getCategory { [unowned self] result in
+            switch result {
+            case .success(let category):
+                self.categories = category
+                getImage()
             case .failure(let error):
                 print(error)
             }
-        } receiveValue: { [self] result in
-            self.categories = result
-            getImage()
-        }.store(in: &cancellable)
+        }
     }
     
     //MARK: - getImage
     func getImage() {
         guard let categories = categories?.сategories else {return}
+        var arrayUrlString: [String] = []
         
         for item in categories {
-            guard let url = URL(string: item.imageURL) else {return}
-            let request = URLRequest(url: url)
-            
-            //издатель
-            let publisher = URLSession.shared.dataTaskPublisher(for: request)
-                .map { $0.data }
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            
-            publisher.sink { [self] completion in
-                switch completion {
-                case .finished:
-                    print("Image publisher was finished")
-                case .failure(let error):
-                    print("Image publisher error \(error.localizedDescription)")
-                    self.updateTableState.send(false)
-                }
-            } receiveValue: { [self] data in
-                self.imageArray.append(data)
-                if imageArray.count == categories.count {
+            arrayUrlString.append(item.imageURL)
+        }
+        networkManager.getImageArray(url: arrayUrlString) { [unowned self] result in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let data):
+                if data.contains(where: {$0 != nil}) {
+                    self.imageArray = data.map {$0!}
                     updateTableState.send(true)
                 }
-            }.store(in: &cancellable)
+            }
         }
     }
 }
